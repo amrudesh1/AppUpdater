@@ -1,14 +1,19 @@
 package com.amrudesh.appupdater
 
-import com.amrudesh.appupdater.enums.Update
+import androidx.annotation.RequiresFeature
+import com.amrudesh.appupdater.enums.UpdateType
+import com.amrudesh.appupdater.enums.UpdateView
 
 /**
  * Created by Amrudesh Balakrishnan.
  */
 interface AppUpdate {
 
-    fun updateViewType(update: Update): AppUpdater
+    fun updateType(update: UpdateType): AppUpdater
+    fun updateViewType(update: UpdateView): AppUpdater
+    fun setServerURL(url: String)
     fun setCheckSum(checksum: String)
     fun setVersion(version: Long)
     fun alertBoxPositionButton(pressed: Boolean)
+    fun create(): AppUpdater
 }

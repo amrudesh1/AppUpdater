@@ -1,2 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.amrudesh.appupdater" />
+    package="com.amrudesh.appupdater">
+
+    <application android:usesCleartextTraffic="true"></application>
+    <uses-permission android:name="android.permission.INTERNET" />
+</manifest>
