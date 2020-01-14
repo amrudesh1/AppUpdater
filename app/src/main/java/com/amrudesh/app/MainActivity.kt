@@ -4,19 +4,25 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import com.amrudesh.appupdater.AppUpdater
-import com.amrudesh.appupdater.Display
-import com.amrudesh.appupdater.enums.Update
+import com.amrudesh.appupdater.enums.UpdateView
 
 class MainActivity : AppCompatActivity() {
+
     lateinit var alertDialog: AlertDialog
+    lateinit var appUpdater: AppUpdater
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val appUpdater = AppUpdater(this)
-        appUpdater.updateViewType(Update.ALERTDIALOG)
+        appUpdater = AppUpdater(this)
+        appUpdater.updateViewType(UpdateView.ALERTDIALOG)
+            .create()
 
 
     }
+
+
+
 }
