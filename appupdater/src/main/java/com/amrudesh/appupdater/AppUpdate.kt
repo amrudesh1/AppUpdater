@@ -7,9 +7,8 @@ import com.amrudesh.appupdater.enums.Update
  */
 interface AppUpdate {
 
-    fun updateType(update: Update): AppUpdater
+    fun updateViewType(update: Update): AppUpdater
     fun setCheckSum(checksum: String)
     fun setVersion(version: Long)
     fun alertBoxPositionButton(pressed: Boolean)
-    fun alertBoxNegativeButton(pressed: Boolean)
 }
