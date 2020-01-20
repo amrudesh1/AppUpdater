@@ -2,9 +2,8 @@ package com.amrudesh.appupdater
 
 import android.content.Context
 import android.content.pm.PackageInfo
-import android.os.Build
 import android.util.Log
-import androidx.annotation.IntegerRes
+import com.amrudesh.appupdater.enums.JsonKeys
 import com.amrudesh.appupdater.model.AppModel
 import okhttp3.*
 import org.json.JSONArray
@@ -17,7 +16,10 @@ import java.security.MessageDigest
  * Created by Amrudesh Balakrishnan.
  */
 class Utility {
-
+    lateinit var appModel: AppModel
+    var arrayList = arrayListOf<AppModel>()
+    lateinit var hashMap: HashMap<JsonKeys, String>
+    var TAG = Utility::class.java.simpleName
 
     fun getAppName(context: Context): String {
         var applicationInfo = context.applicationInfo
@@ -59,9 +61,9 @@ class Utility {
         return version
     }
 
-    fun checkforUpdate(): ArrayList<AppModel> {
-        var arrayList = arrayListOf<AppModel>()
+    fun checkforUpdate(hashMap: HashMap<JsonKeys, String>): ArrayList<AppModel> {
         val client = OkHttpClient()
+        this.hashMap = hashMap
         val request = Request.Builder()
             .url("http://103.248.116.46:8080/appserveratv/rest/384a8294-e470-4907-8563-75c448d6c3ff/ota/update?romVersion=ALL_ROMS")
             .get()
@@ -74,99 +76,98 @@ class Utility {
             }
 
             override fun onResponse(call: Call, response: Response) {
-                val jsonDataString = response.body?.string()
-                lateinit var appModel: AppModel
-
-                val data = JSONObject(jsonDataString)
                 if (response.isSuccessful) {
-                    if (data != null) {
-                        val iterator: Iterator<String> = data.keys()
-                        while (iterator.hasNext()) {
-                            appModel = AppModel("")
-                            val key: String = iterator.next()
-                            try {
-                                if (data.get(key) is JSONArray) {
-                                    val jsonArray = data.getJSONArray(key)
-                                    val size = jsonArray.length()
-                                    for (i in 0 until size) {
-                                        dynamicJSONParser(jsonArray.getJSONObject(i))
-                                    }
-                                } else if (data.get(key) is JSONObject) {
-                                    dynamicJSONParser(data.getJSONObject(key))
-                                } else {
-                                    if (key.contains("version")) {
-                                        Log.i(
-                                            "DynamicParser",
-                                            "dynamicJSONParser: " + data.getString(key)
-                                        )
-                                        appModel.versionCode = Integer.parseInt(data.getString(key))
-                                    } else if (key.contains("versionCode")) {
-                                        Log.i(
-                                            "DynamicParser",
-                                            "dynamicJSONParser: " + data.getString(key)
-                                        )
-                                        appModel.versionName = data.getString(key)
-                                    } else if (key.contains("download") || data.getString(key).endsWith(
-                                            ".apk"
-                                        )
-                                    ) {
-                                        appModel.downloadURL = data.getString(key)
-                                    }
-                                }
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                            }
-                            arrayList.add(appModel)
-                        }
-                    }
-                    Log.i(
-                        "DynamicParser",
-                        "dynamicJSONParser: " + BuildConfig.VERSION_CODE + " " + BuildConfig.VERSION_NAME + " " + arrayList.size
-                    )
+                    val jsonDataString = response.body?.string()
+                    dynamicJSONParser(JSONObject(jsonDataString))
+                    Log.i(TAG, "OnSuccess:$jsonDataString")
+
+
                 }
+
             }
+
         });
 
         return arrayList
     }
 
 
-    fun dynamicJSONParser(data: JSONObject?): String {
-
-        var downloadURL: String? = null
+    fun dynamicJSONParser(data: JSONObject?) {
+        var count = 0
         if (data != null) {
+            appModel = AppModel("")
+
             val iterator: Iterator<String> = data.keys()
             while (iterator.hasNext()) {
                 val key: String = iterator.next()
-
                 try {
+
                     if (data.get(key) is JSONArray) {
                         val jsonArray = data.getJSONArray(key)
                         val size = jsonArray.length()
-                        for (i in 0 until size) {
+                        for (i in 0 until size - 1) {
                             dynamicJSONParser(jsonArray.getJSONObject(i))
                         }
                     } else if (data.get(key) is JSONObject) {
                         dynamicJSONParser(data.getJSONObject(key))
                     } else {
-                        if (key.contains("version")) {
-                            Log.i("DynamicParser", "dynamicJSONParser: " + data.getString(key))
-                        } else if (key.contains("versionNumber")) {
-                            Log.i("DynamicParser", "dynamicJSONParser: " + data.getString(key))
+
+                        hashMap.forEach { (keyValue, value) ->
+                            if (keyValue == JsonKeys.PACKAGE)
+                                if (key == value)
+                                    appModel.packageName = data.getString(value)
+
+                            if (keyValue == JsonKeys.DOWNLOAD_URL)
+                                if (key == value)
+                                    appModel.downloadURL = data.getString(value)
+
+                            if (keyValue == JsonKeys.MD5)
+                                if (key == value)
+                                    appModel.md5Sum = data.getString(value)
+
+
+
+                            if (keyValue == JsonKeys.VERSION_CODE) {
+                                Log.i(TAG, "VersionCode: " +data.getInt("versionNumber"))
+                                if (key == value || key == "versionNumber") {
+                                    appModel.versionCode = data.getInt(value)
+                                } else {
+                                    appModel.versionCode = data.getInt("versionNumber")
+
+                                }
+                            }
+
+                            if (keyValue == JsonKeys.VERSION)
+                                if (key == value)
+                                    appModel.versionName = data.getString(value)
+
+
+                            setArrayList(appModel)
+                            Log.i(TAG, "JSONMAP:${appModel.packageName}")
+
                         }
-
-
                     }
+
+
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
+
             }
+
         }
-        Log.i(
-            "DynamicParser",
-            "dynamicJSONParser: " + BuildConfig.VERSION_CODE + " " + BuildConfig.VERSION_NAME
-        )
-        return "downloadURL"
+    }
+
+
+    private fun setArrayList(appModel: AppModel) {
+        arrayList.clear()
+        arrayList.add(appModel)
+        for (i in arrayList) {
+            Log.i("DynamicParser", "checkforUpdate: " + i.md5Sum)
+
+        }
+        Log.i("DynamicParser", "setArrayList: " + arrayList.size)
+
     }
 
 
