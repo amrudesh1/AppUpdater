@@ -7,4 +7,6 @@ data class AppModel(var name: String) {
     var versionName: String = ""
     var versionCode: Int = 0
     var downloadURL: String = ""
+    var md5Sum: String = ""
+    var packageName: String = ""
 }
