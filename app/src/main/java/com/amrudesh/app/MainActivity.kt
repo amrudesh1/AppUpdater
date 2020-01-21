@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import com.amrudesh.appupdater.AppUpdater
 import com.amrudesh.appupdater.enums.JsonKeys
+import com.amrudesh.appupdater.enums.UpdateType
 import com.amrudesh.appupdater.enums.UpdateView
 
 class MainActivity : AppCompatActivity() {
@@ -27,6 +28,8 @@ class MainActivity : AppCompatActivity() {
 
         appUpdater = AppUpdater(this)
         appUpdater.updateViewType(UpdateView.ALERTDIALOG)
+            .updateType(UpdateType.IMMEDIATE)
+           // .setAlertDialogData("Hi", "Hi", "Hi", "Hi")
             .setMap(hashMap)
             .create()
 

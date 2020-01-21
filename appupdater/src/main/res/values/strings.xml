@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="alertTitle">Update Available</string>
+    <string name="alertDescription">Hi , A New update is available for download. Click the Update Button</string>
+    <string name="alertPositiveButton">Update Now</string>
+    <string name="alertNegativeButton">Later</string>
+</resources>

@@ -11,10 +11,15 @@ import com.amrudesh.appupdater.enums.UpdateView
 interface AppUpdate {
     fun updateType(update: UpdateType): AppUpdater
     fun updateViewType(update: UpdateView): AppUpdater
-    fun setServerURL(url: String)
-    fun setCheckSum(checksum: String)
-    fun setVersion(version: Long)
-    fun alertBoxPositionButton(pressed: Boolean)
+    fun setServerURL(url: String): AppUpdater
+    fun setAlertDialogData(
+        title: String = " ",
+        description: String = " ",
+        positiveButtonText: String = " ",
+        negativeButtonText: String= " "
+    ): AppUpdater
+
+    fun setAlertDialogLogoResource(resourceId: Int)
     fun setMap(hashMap: HashMap<JsonKeys, String>): AppUpdater
     fun create(): AppUpdater
 

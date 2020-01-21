@@ -1,7 +1,10 @@
 package com.amrudesh.appupdater
 
+import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageInfo
+import android.content.res.Resources
+import android.util.DisplayMetrics
 import android.util.Log
 import com.amrudesh.appupdater.enums.JsonKeys
 import com.amrudesh.appupdater.model.AppModel
@@ -170,5 +173,11 @@ class Utility {
 
     }
 
+    fun getHeight(): Int {
+        return Resources.getSystem().displayMetrics.heightPixels
+    }
 
+    fun getWidth(): Int {
+        return Resources.getSystem().displayMetrics.widthPixels
+    }
 }

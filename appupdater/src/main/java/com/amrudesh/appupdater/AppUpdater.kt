@@ -1,7 +1,9 @@
 package com.amrudesh.appupdater
 
 import android.content.Context
+import android.text.Layout
 import android.util.Log
+import android.view.WindowManager.LayoutParams
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.amrudesh.appupdater.enums.JsonKeys
@@ -9,6 +11,7 @@ import com.amrudesh.appupdater.enums.UpdateType
 import com.amrudesh.appupdater.enums.UpdateView
 import com.amrudesh.appupdater.model.AppModel
 import com.google.android.material.snackbar.Snackbar
+
 
 /**
  * Created by Amrudesh Balakrishnan.
@@ -22,11 +25,20 @@ class AppUpdater(var context: Context) : AppUpdate {
     lateinit var objectMap: HashMap<JsonKeys, String>
     lateinit var url: String
     lateinit var appModel: AppModel
+    var alertImageRes: Int = R.drawable.google_play
+    var alertTitle: String = context.getString(R.string.alertTitle)
+    var alertDesc: String = context.getString(R.string.alertDescription)
+    var alertPosBtn: String = context.getString(R.string.alertPositiveButton)
+    var alertNegBtn: String = context.getString(R.string.alertNegativeButton)
+    var updateNow: Boolean = false
 
 
     override fun updateType(update: UpdateType): AppUpdater {
         //Default is Immediate Update
         this.updateType = update
+        if (update == UpdateType.IMMEDIATE) {
+            updateNow = true
+        }
         return this
     }
 
@@ -41,21 +53,28 @@ class AppUpdater(var context: Context) : AppUpdate {
         return this
     }
 
-    override fun setCheckSum(checksum: String) {
 
-    }
-
-    override fun setVersion(version: Long) {
-
-    }
-
-    override fun alertBoxPositionButton(pressed: Boolean) {
-
-    }
-
-
-    override fun setServerURL(url: String) {
+    override fun setServerURL(url: String): AppUpdater {
         this.url = url
+        return this
+    }
+
+    override fun setAlertDialogData(
+        title: String,
+        description: String,
+        positiveButtonText: String,
+        negativeButtonText: String
+    ): AppUpdater {
+        alertTitle = title
+        alertDesc = description
+        alertPosBtn = positiveButtonText
+        alertNegBtn = negativeButtonText
+
+        return this
+    }
+
+    override fun setAlertDialogLogoResource(resourceId: Int) {
+        this.alertImageRes = resourceId
     }
 
     override fun create(): AppUpdater {
@@ -77,16 +96,24 @@ class AppUpdater(var context: Context) : AppUpdate {
             }
 
 
-
-
-
         }
         if (isUpdateAvailable) {
             when (updateView) {
                 UpdateView.ALERTDIALOG -> {
                     alertDialog =
-                        Display().showUpdateAvailableDialog(context, "Hi", "Hi", "Hi").create()
+                        Display().showUpdateAvailableDialog(
+                            context,
+                            alertTitle,
+                            alertDesc,
+                            alertPosBtn,
+                            alertNegBtn,
+                            alertImageRes,
+                            updateNow
+                        ).create()
+
+
                     alertDialog.show()
+//                    alertDialog.window?.setLayout(LayoutParams.WRAP_CONTENT,1500)
                 }
                 UpdateView.SNACKBAR -> {
                     Toast.makeText(context, "Coming Soon", Toast.LENGTH_SHORT).show()
